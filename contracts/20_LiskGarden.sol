@@ -10,6 +10,12 @@ contract LiskGarden {
     // SEED, SPROUT, GROWING, BLOOMING
     // Hint: enum GrowthStage { SEED, SPROUT, GROWING, BLOOMING }
 
+    enum GrowthStage {
+        SEED,
+        SPROUT,
+        GROWING,
+        BLOOMING
+    }
 
     // TODO 1.2: Buat struct Plant dengan 8 fields:
     // - uint256 id
@@ -21,73 +27,81 @@ contract LiskGarden {
     // - bool exists
     // - bool isDead
 
-
-
+    struct Plant {
+        uint256 id;
+        address owner;
+        GrowthStage stage;
+        uint256 plantedDate;
+        uint256 lastWatered;
+        uint8 waterLevel;
+        bool exists;
+        bool isDead;
+    }
 
     // ============================================
     // BAGIAN 2: STATE VARIABLES
     // ============================================
     // TODO 2.1: Mapping plantId ke Plant
     // Hint: mapping(uint256 => Plant) public plants;
-
+    mapping(uint256 => Plant) public plants;
 
     // TODO 2.2: Mapping address ke array plantId (track tanaman user)
     // Hint: mapping(address => uint256[]) public userPlants;
-
+    mapping(address => uint256[]) public userPlants;
 
     // TODO 2.3: Counter untuk ID tanaman baru
     // Hint: uint256 public plantCounter;
-
+    uint256 public plantCounter;
 
     // TODO 2.4: Address owner contract
     // Hint: address public owner;
-
+    address public owner;
 
     // ============================================
     // BAGIAN 3: CONSTANTS (Game Parameters)
     // ============================================
     // TODO 3.1: Harga tanam = 0.001 ether
     // Hint: uint256 public constant PLANT_PRICE = 0.001 ether;
-
+    uint256 public constant PLANT_PRICE = 0.001 ether;
 
     // TODO 3.2: Reward panen = 0.003 ether
-
+    uint256 public constant HARVEST_REWARD = 0.003 ether;
 
     // TODO 3.3: Durasi per stage = 1 menit
     // Hint: uint256 public constant STAGE_DURATION = 1 minutes;
-
+    uint256 public constant STAGE_DURATION = 1 minutes;
 
     // TODO 3.4: Waktu deplesi air = 30 detik
-
+    uint256 public constant WATER_DEPLETION_TIME = 30 seconds;
 
     // TODO 3.5: Rate deplesi = 2 (2% setiap interval)
     // Hint: uint8 public constant WATER_DEPLETION_RATE = 2;
-
+    uint8 public constant WATER_DEPLETION_RATE = 2;
 
     // ============================================
     // BAGIAN 4: EVENTS
     // ============================================
     // TODO 4.1: Event PlantSeeded(address indexed owner, uint256 indexed plantId)
-
+    event PlantSeeded(address indexed owner, uint256 indexed plantId);
 
     // TODO 4.2: Event PlantWatered(uint256 indexed plantId, uint8 newWaterLevel)
-
+    event PlantWatered(uint256 indexed plantId, uint8 newWaterLevel);
 
     // TODO 4.3: Event PlantHarvested(uint256 indexed plantId, address indexed owner, uint256 reward)
-
+    event PlantHarvested(uint256 indexed plantId, address indexed owner, uint256 reward);
 
     // TODO 4.4: Event StageAdvanced(uint256 indexed plantId, GrowthStage newStage)
-
+    event StageAdvanced(uint256 indexed plantId, GrowthStage newStage);
 
     // TODO 4.5: Event PlantDied(uint256 indexed plantId)
-
+    event PlantDied(uint256 indexed plantId);
 
     // ============================================
     // BAGIAN 5: CONSTRUCTOR
     // ============================================
     // TODO 5: Set owner = msg.sender
     constructor() {
-
+        owner = msg.sender;
     }
 
     // ============================================
@@ -107,10 +121,27 @@ contract LiskGarden {
     function plantSeed() external payable returns (uint256) {
         // TODO: Implement fungsi ini
         // Hint: Lihat spesifikasi di atas!
+        require(msg.value >= PLANT_PRICE, "Not enough ETH to plant seed");
 
+        plantCounter++;
+        uint256 newId = plantCounter;
 
+        plants[newId] = Plant({
+            id: newId,
+            owner: msg.sender,
+            stage: GrowthStage.SEED,
+            plantedDate: block.timestamp,
+            lastWatered: block.timestamp,
+            waterLevel: 100,
+            exists: true,
+            isDead: false
+        });
 
+        userPlants [msg.sender].push(newId);
 
+        emit PlantSeeded(msg.sender, newId);
+
+        return newId;
     }
 
     // ============================================
@@ -129,10 +160,21 @@ contract LiskGarden {
 
     function calculateWaterLevel(uint256 plantId) public view returns (uint8) {
         // TODO: Implement
+        Plant memory plant = plants[plantId]; //ini apa memoty plant ambil dari storage?
 
+        if(!plant.exists || plant.isDead){
+            return 0;
+        }
+        
+        uint256 timeSinceWatered = block.timestamp - plant.lastWatered;
+        uint256 depletionIntervals = timeSinceWatered / WATER_DEPLETION_TIME;
+        uint256 waterLost = depletionIntervals * WATER_DEPLETION_RATE;
 
+        if(waterLost >= plant.waterLevel){
+            return 0;
+        }
 
-
+        return uint8(plant.waterLevel - waterLost);
     }
 
     // TODO 7.2: updateWaterLevel (internal)
@@ -144,9 +186,15 @@ contract LiskGarden {
 
     function updateWaterLevel(uint256 plantId) internal {
         // TODO: Implement
+        Plant storage plant = plants[plantId];
 
+        uint8 currentWater = calculateWaterLevel(plantId);
+        plant.waterLevel = currentWater; //what is this for?
 
-
+        if (currentWater == 0 && !plant.isDead){
+            plant.isDead = true;
+            emit PlantDied(plantId);
+        }
     }
 
     // TODO 7.3: waterPlant (external)
@@ -161,11 +209,15 @@ contract LiskGarden {
 
     function waterPlant(uint256 plantId) external {
         // TODO: Implement
+        Plant storage plant = plants[plantId];
 
+        require(plant.owner == msg.sender, "Not your plant!");
+        updateWaterLevel(plantId);
 
+        plant.waterLevel = 100;
+        plant.lastWatered = block.timestamp;
 
-
-
+        emit PlantWatered(plantId, 100);
     }
 
     // ============================================
@@ -184,12 +236,31 @@ contract LiskGarden {
 
     function updatePlantStage(uint256 plantId) public {
         // TODO: Implement
+        Plant storage plant = plants[plantId];
 
+        require(plant.exists, "Plant doesn't exist!");
+        require(plant.owner == msg.sender, "Not your Plant!");
 
+        updateWaterLevel(plantId);
 
+        if(plant.isDead){
+            return;
+        }
 
+        uint256 timeSincePlanted = block.timestamp - plant.plantedDate;
+        GrowthStage oldStage = plant.stage;
 
-
+        if(timeSincePlanted >= STAGE_DURATION * 3){
+            plant.stage = GrowthStage.BLOOMING;
+        } else if(timeSincePlanted >= STAGE_DURATION * 2){
+            plant.stage = GrowthStage.GROWING;
+        } else if(timeSincePlanted >= STAGE_DURATION) {
+            plant.stage = GrowthStage.SPROUT;
+        } 
+        
+        if(plant.stage != oldStage) {
+            emit StageAdvanced(plantId, plant.stage);
+        }
     }
 
     // TODO 8.2: harvestPlant (external)
@@ -206,13 +277,22 @@ contract LiskGarden {
 
     function harvestPlant(uint256 plantId) external {
         // TODO: Implement
+        Plant storage plant = plants[plantId];
 
+        require(plant.exists, "Plant does not exist!");
+        require(plant.owner == msg.sender, "Not your plant!");
+        require(!plant.isDead, "Plant already dead");
 
+        updatePlantStage(plantId);
+        require(plant.stage == GrowthStage.BLOOMING, "Not blooming yet");
 
+        plant.exists = false;
 
+        emit PlantHarvested(plantId, msg.sender, HARVEST_REWARD);
 
+        (bool success, ) = msg.sender.call{value: HARVEST_REWARD}("");
 
-
+        require(success, "Reward transfer failed");
     }
 
     // ============================================
@@ -231,7 +311,7 @@ contract LiskGarden {
 
     function withdraw() external {
         require(msg.sender == owner, "Bukan owner");
-        (bool success, ) = owner.call\{value: address(this).balance\}("");
+        (bool success, ) = owner.call{value: address(this).balance}("");
         require(success, "Transfer gagal");
     }
 
