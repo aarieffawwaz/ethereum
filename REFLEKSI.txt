@@ -1,5 +1,16 @@
-KELAS RUTIN 4
-Nama: Aarief Fawwaz Satriahutama
-1. Apa yang dipelajari hari ini
-2. Tantangan yang dihadapi
-3. Tujuan untuk sesi berikutnya
+### ✅ KELAS RUTIN 4
+
+**Nama:** Aarief Fawwaz Satriahutama
+
+**1. Apa yang dipelajari hari ini**
+Hari ini saya mempelajari alur pembuatan smart contract mulai dari konsep dasar (string, number, boolean, require, struct, enum, mapping, events) sampai berhasil membangun game sederhana **LiskGarden** di blockchain. Saya juga belajar cara melakukan transaksi dengan ETH, meng-update state kontrak, dan memahami mengapa blockchain tidak otomatis memperbarui data tanpa pemanggilan fungsi.
+
+**2. Tantangan yang dihadapi**
+Saya masih pemula, jadi saya sempat bingung dengan error compilation, perbedaan `memory` dan `storage`, serta cara kerja `mapping` dan `events`. Saya juga mengalami kendala saat transfer reward ETH karena kontrak tidak memiliki balance, sehingga muncul error *"Reward transfer failed"*. Tapi dengan mencoba dan eksplorasi, tantangan tersebut bisa saya pecahkan satu per satu.
+
+**3. Tujuan untuk sesi berikutnya**
+
+* Deploy LiskGarden ke testnet agar bisa dimainkan orang lain
+* Menambahkan UI sederhana (misalnya pakai HTML/React) agar gameplay lebih mudah
+* Mempelajari keamanan dasar smart contract
+* Menyempurnakan dokumentasi dan menambahkan fitur lanjutan seperti NFT atau leaderboard
