@@ -1,0 +1,16 @@
+{
+    "name": "Plant #0",
+    "description": "A rare golden orchid",
+    "image": "https://gateway.pinata.cloud/ipfs/bafkreig2enaf723qvvqzg4fyzji7chcatjutq7kmzqzvc7acxhg6sxr7bm",
+    "external_url": "https://gateway.pinata.cloud/ipfs/bafkreig2enaf723qvvqzg4fyzji7chcatjutq7kmzqzvc7acxhg6sxr7bm",
+    "attributes": [
+        {
+            "trait_type": "Rarity",
+            "value": "Legendary"
+        },
+        {
+            "trait_type": "Species",
+            "value": "Golden Orchid"
+        }
+    ]
+}

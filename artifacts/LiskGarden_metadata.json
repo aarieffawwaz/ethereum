@@ -450,7 +450,7 @@
 	},
 	"settings": {
 		"compilationTarget": {
-			"contracts/20_LiskGarden.sol": "LiskGarden"
+			"contracts/LiskGarden.sol": "LiskGarden"
 		},
 		"evmVersion": "prague",
 		"libraries": {},
@@ -464,12 +464,12 @@
 		"remappings": []
 	},
 	"sources": {
-		"contracts/20_LiskGarden.sol": {
-			"keccak256": "0xde10722c280a2325c82bd2931edfe9b19ba6cb091b2facba5a1101792e31c879",
+		"contracts/LiskGarden.sol": {
+			"keccak256": "0x8731ba848e190cd4e00f9e2aba903961758551046a53e799d81db739428d4784",
 			"license": "MIT",
 			"urls": [
-				"bzz-raw://9d60064e0fbf8625a8fcbb9bfac50645525dde650f5e78b9aa3e2dec070d1b57",
-				"dweb:/ipfs/QmSXcKhiA43e6hwLwfYxpC7GhH4yvx7aFGcsz49QZTjkm5"
+				"bzz-raw://cdf8883787b98d6daaff08e67c5faa31d6882eebcca4ed4c508b215cb61335d8",
+				"dweb:/ipfs/QmPLjQ3YV4KGkQFAkmFVCSMnvEURDZrjUHz8TdBgJ2LECb"
 			]
 		}
 	},
